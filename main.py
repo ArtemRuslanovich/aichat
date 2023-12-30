@@ -2,7 +2,7 @@ from transformers import GPTNeoForCausalLM, GPT2Tokenizer
 import torch
 
 # Load pre-trained model and tokenizer
-model = GPTNeoForCausalLM.from_pretrained("EleutherAI/gpt-neo-1.3B")
+model = GPTNeoForCausalLM.from_pretrained("D:\aichat\model\model (1).safetensors")
 tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
 # Example text generation
