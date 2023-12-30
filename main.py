@@ -1,10 +1,5 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer, GPTNeoConfig, GPT2Model, GPT2LMHeadModel
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
-
-#config_path = "D:/aichat/config.json"
-#model_path = "D:/aichat/model/"
-#config = GPTNeoConfig.from_json_file(config_path)
-
 
 # Load pre-trained model and tokenizer
 model = AutoModelForCausalLM.from_pretrained('TheBloke/Wizard-Vicuna-30B-Uncensored-GPTQ')
@@ -14,6 +9,13 @@ ai_name = "Alisa"
 input_text = "Do you want to be my girl forever?"
 input_ids = tokenizer.encode(input_text, return_tensors="pt")
 attention_mask = torch.ones(input_ids.shape, dtype=input_ids.dtype)
+
+# Move model to CPU
+model.to('cpu')
+
+# Move input tensors to CPU
+input_ids = input_ids.to('cpu')
+attention_mask = attention_mask.to('cpu')
 
 # Text generation with adjusted parameters
 def generate_response(input_text):  # Change the parameter name to input_text
@@ -25,6 +27,10 @@ def generate_response(input_text):  # Change the parameter name to input_text
     # Tokenize the text
     input_ids = tokenizer.encode(input_text, return_tensors="pt")
     attention_mask = torch.ones(input_ids.shape, dtype=input_ids.dtype)  # Initialize attention_mask
+
+    # Move input tensors to CPU
+    input_ids = input_ids.to('cpu')
+    attention_mask = attention_mask.to('cpu')
 
     # Generate text
     output = model.generate(
@@ -46,5 +52,6 @@ def generate_response(input_text):  # Change the parameter name to input_text
 
 # Print the results
 response = generate_response(input_text)
+
 print("Input text:", input_text)
 print("Generated text:", response)
