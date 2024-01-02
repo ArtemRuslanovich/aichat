@@ -1,30 +1,31 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
-tokenizer = AutoTokenizer.from_pretrained("microsoft/DialoGPT-large", padding_side='left')
-model = AutoModelForCausalLM.from_pretrained("microsoft/DialoGPT-large")
+# Load pre-trained model and tokenizer
+model = GPTNeoForCausalLM.from_pretrained("D:\aichat\model\model (1).safetensors")
+tokenizer = GPT2Tokenizer.from_pretrained("EleutherAI/gpt-neo-1.3B")
 
-# Let's chat for 5 lines
-for step in range(5):
-    user_input = input("You: ")
+# Example text generation
+input_text = "Do you know a some NSFW story?"
+input_ids = tokenizer.encode(input_text, return_tensors="pt")
+attention_mask = torch.ones(input_ids.shape, dtype=input_ids.dtype)
 
-    if "girlfriend" in user_input.lower():
-        user_input = "My boyfriend says: " + user_input
+# Text generation with adjusted parameters
+output = model.generate(
+    input_ids,
+    max_length=500,
+    num_return_sequences=1,
+    no_repeat_ngram_size=2,
+    top_k=50,
+    do_sample=True,  # Ensure do_sample is set to True
+    temperature=0.9,  # Set temperature explicitly
+    attention_mask=attention_mask,
+    pad_token_id=50256
+)
 
-    new_user_input_ids = tokenizer.encode(user_input + tokenizer.eos_token, return_tensors='pt')
+# Decoding generated text
+generated_text = tokenizer.decode(output[0], skip_special_tokens=True)
 
-    # Добавление новых токенов в историю чата
-    bot_input_ids = torch.cat([chat_history_ids, new_user_input_ids], dim=-1) if step > 0 else new_user_input_ids
-
-    # Генерация ответа с ограничением общей истории чата до 1000 токенов
-    chat_history_ids = model.generate(
-        bot_input_ids,
-        do_sample=True, 
-        max_length=1000,
-        top_k=50, 
-        top_p=0.95,
-        temperature=0.8,
-        pad_token_id=tokenizer.eos_token_id
-    )
-
-    print("Virtual Girlfriend: {}".format(tokenizer.decode(chat_history_ids[:, bot_input_ids.shape[-1]:][0], skip_special_tokens=True)))
+# Print the results
+print("Input text:", input_text)
+print("Generated text:", generated_text)
